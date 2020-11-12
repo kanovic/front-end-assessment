@@ -1,25 +1,125 @@
-import logo from './logo.svg';
-import './App.css';
+//Imports
+import React from 'react';
+import {useState, useEffect} from 'react';
+import Feature from './components/Feature';
+import Movie from './components/Movie';
+import Footer from './components/Footer';
 
-function App() {
+//Define top App component
+const App = () => {
+  //Set state variables
+  const [movies, setMovies] = useState([]);
+  const [ids, setIds] = useState(['tt0089218', 'tt0099472']);
+  const [features, setFeatures] = useState([]);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [plot, setPlot] = useState('&plot=full');
+
+  //Query featured movies
+  useEffect(() => {
+    ids.forEach(id => {
+      fetch(`http://www.omdbapi.com/?apiKey=6c3a2d45&i=${id}&plot=full`)
+        .then(res => res.json())
+        .then(data => setFeatures(old => [...old, data]))
+        .catch(err => console.log(err));
+    });
+    setFeatures([]);
+  }, []);
+
+  //Search function
+  const onSubmitHandler = e => {
+    e.preventDefault();
+
+    fetch(`http://www.omdbapi.com/?apiKey=6c3a2d45&s=${searchTerm}${plot}`)
+      .then(res => res.json())
+      .then(data => {
+        const newData = data.Search.slice(0, 5);
+
+        newData.forEach(obj => {
+          fetch(
+            `http://www.omdbapi.com/?apiKey=6c3a2d45&i=${obj.imdbID}${plot}`
+          )
+            .then(res => res.json())
+            .then(data => setMovies(old => [...old, data]));
+        });
+        setMovies([]);
+      })
+      .catch(error => console.log(error));
+    setSearchTerm('');
+  };
+
+  //
+
+  //Utilities
+  const onChangeHandler = e => {
+    setSearchTerm(e.target.value);
+  };
+
+  const plotHandler = e => {
+    setPlot(e.target.value);
+  };
+
+  const shortPlot = plot => {
+    return plot.split(' ').slice(0, 20).join(' ') + '...';
+  };
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <>
+      <nav
+        className='navbar mb-6 p-3'
+        role='navigation'
+        aria-label='main navigation'>
+        <div className='navbar-brand'>
+          <a className='navbar-item' href='/'>
+            <h1 className='title'>Cinema App</h1>
+          </a>
+        </div>
+        <div className='navbar-end'>
+          <div className='navbar-item'>Plot:</div>
+          <div className='navbar-item'>
+            <div className='select'>
+              <select value={plot} onChange={plotHandler}>
+                <option value='&amp;plot=full'>Full</option>
+                <option value='' selected>
+                  Short
+                </option>
+              </select>
+            </div>
+          </div>
+        </div>
+        <div className='navbar-item'>
+          <form onSubmit={onSubmitHandler}>
+            <input
+              type='search'
+              className='input'
+              placeholder='Press enter to search'
+              value={searchTerm}
+              onChange={onChangeHandler}
+            />
+          </form>
+        </div>
+      </nav>
+
+      <div className='container px-5'>
+        <h1 className='title is-4 m-5'>Featured Movies</h1>
+        <div className='columns'>
+          {features.map(feature => (
+            <Feature
+              key={feature.imdbID}
+              feature={feature}
+              shortPlot={shortPlot}
+            />
+          ))}
+        </div>
+      </div>
+      <div id='searchResult' className='container px-5'>
+        <h1 className='title is-4 m-5'>Search Results</h1>
+        {movies.map(movie => (
+          <Movie key={movie.imdbID} movie={movie} shortPlot={shortPlot} />
+        ))}
+      </div>
+      <Footer />
+    </>
   );
-}
+};
 
 export default App;
