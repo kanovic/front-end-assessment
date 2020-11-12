@@ -17,7 +17,7 @@ const App = () => {
   //Query featured movies
   useEffect(() => {
     ids.forEach(id => {
-      fetch(`http://www.omdbapi.com/?apiKey=6c3a2d45&i=${id}&plot=full`)
+      fetch(`https://www.omdbapi.com/?apiKey=6c3a2d45&i=${id}&plot=full`)
         .then(res => res.json())
         .then(data => setFeatures(old => [...old, data]))
         .catch(err => console.log(err));
@@ -29,14 +29,14 @@ const App = () => {
   const onSubmitHandler = e => {
     e.preventDefault();
 
-    fetch(`http://www.omdbapi.com/?apiKey=6c3a2d45&s=${searchTerm}${plot}`)
+    fetch(`https://www.omdbapi.com/?apiKey=6c3a2d45&s=${searchTerm}${plot}`)
       .then(res => res.json())
       .then(data => {
         const newData = data.Search.slice(0, 5);
 
         newData.forEach(obj => {
           fetch(
-            `http://www.omdbapi.com/?apiKey=6c3a2d45&i=${obj.imdbID}${plot}`
+            `https://www.omdbapi.com/?apiKey=6c3a2d45&i=${obj.imdbID}${plot}`
           )
             .then(res => res.json())
             .then(data => setMovies(old => [...old, data]));
