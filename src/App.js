@@ -21,7 +21,7 @@ const App = () => {
   useEffect(() => {
     ids.forEach((id) => {
       fetch(
-        `http://www.omdbapi.com/?apikey=${process.env.REACT_APP_API_KEY}&i=${id}${plot}`
+        `https://www.omdbapi.com/?apikey=${process.env.REACT_APP_API_KEY}&i=${id}${plot}`
       )
         .then((res) => res.json())
         .then((data) => setFeatures((old) => [...old, data]))
@@ -35,7 +35,7 @@ const App = () => {
     e.preventDefault();
 
     fetch(
-      `http://www.omdbapi.com/?apikey=${process.env.REACT_APP_API_KEY}&s=${searchTerm}${plot}`
+      `https://www.omdbapi.com/?apikey=${process.env.REACT_APP_API_KEY}&s=${searchTerm}${plot}`
     )
       .then((res) => res.json())
       .then((data) => {
@@ -43,7 +43,7 @@ const App = () => {
 
         newData.forEach((obj) => {
           fetch(
-            `http://www.omdbapi.com/?apikey=${process.env.REACT_APP_API_KEY}&i=${obj.imdbID}${plot}`
+            `https://www.omdbapi.com/?apikey=${process.env.REACT_APP_API_KEY}&i=${obj.imdbID}${plot}`
           )
             .then((res) => res.json())
             .then((data) => setMovies((old) => [...old, data]));
